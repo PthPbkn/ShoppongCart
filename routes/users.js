@@ -1,0 +1,71 @@
+var express = require('express');
+var router = express.Router();
+const productHelpers = require('../helpers/product-helpers')
+const userHelpers = require('../helpers/user-helpers')
+
+/* function to verify user is logged in */
+const verifyLoggedIn=((req,res,next)=>{
+  if(req.session.loggedIn){
+    next()
+  } else {
+    res.redirect('/logIn')
+  }
+})
+
+/* GET home page. */
+router.get('/', function(req, res, next){  
+  let user=req.session.user
+   console.log(user)
+  productHelpers.getAllProducts().then((products)=>{
+    res.render('user/view-products',{products,user});
+  }) 
+
+});
+
+router.get('/logIn',function(req,res,next){
+  if(req.session.loggedIn){
+    res.redirect('/')
+  } else{
+    res.render('user/logIn',{"LoginErr":req.session.loginErr})
+    req.session.loginErr=false
+  }
+  
+})
+
+router.post('/logIn',(req,res)=>{
+  userHelpers.doLogin(req.body).then((response)=>{
+    if(response.status){
+      req.session.loggedIn=true
+      req.session.user=response.user 
+      res.redirect('/')
+      console.log('login success')
+    }    
+    else{
+      //req.session.loginErr=true OR another methode below
+      req.session.loginErr="Invalid username OR password"
+      res.redirect('/logIn')
+    }
+  })
+})
+
+router.get('/logout',(req,res)=>{
+  req.session.destroy()
+  res.redirect('/')
+})
+
+router.get('/signUp',function(req,res,next){
+  res.render('user/signUp')
+})
+
+router.post('/signUp',(req,res)=>{
+  userHelpers.doSignUp(req.body).then((response)=>{
+    console.log(response)
+  })
+})
+
+
+router.get('/cart', verifyLoggedIn,(req,res)=>{
+  res.render('user/cart')
+})
+
+module.exports = router;    
