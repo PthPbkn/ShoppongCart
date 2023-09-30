@@ -14,7 +14,7 @@
                 </form>
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                        <a class="nav-link active" aria-current="page" href="/admin">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="#">Products</a>
@@ -24,8 +24,27 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="#">Users</a>
-                    </li>
-                </ul>                
+                    </li>                  
+                </ul>
+                <div class="dropdown">
+                        <button class="btn btn-outline-success dropdown-toggle" type="button" id="dropdownMenuButton1"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            {{#if user}}
+                            {{user.fName}}{{user.lName}}
+                            {{else}}
+                            My Account
+                            {{/if}}
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+
+                            {{#if user}}
+                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                            {{else}}
+                            <li><a class="dropdown-item" href="/login">User Login</a></li>
+                            <li><a class="dropdown-item" href="/admin">Admin Login</a></li>
+                            {{/if}}
+                        </ul>
+                    </div>
             </div>
         </div>
     </nav>

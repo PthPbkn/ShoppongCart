@@ -2,6 +2,7 @@ var db= require('../config/dbConnection')
 var collection=require('../config/collections');
 var objectId=require('mongodb').objectId //get mongodb object function
 const { response } = require('express');
+const { ObjectId } = require('mongodb');
 
 
 module.exports={
@@ -20,9 +21,8 @@ module.exports={
     },
     deleteProduct:(prodId)=>{
         return new Promise((resolve,reject)=>{
-            console.log(prodId)
-        db.get().collection(collection.PRODUCT_COLLECTION).removeOne({_id:"prodId"}).then((response)=>{ //using mongodb object to convert prodId similar to mongodb
-            resolve(response)
+            db.get().collection(collection.PRODUCT_COLLECTION).deleteOne({_id: new ObjectId(prodId)}).then((response)=>{ //using mongodb object to convert prodId similar to mongodb
+            resolve(response)  
         })
         })
     }
