@@ -1,0 +1,46 @@
+<section class="container">
+    <div class="mt-5">
+        <h3>Edit product</h3>
+        <form action="/admin/edit-product/{{productDetails._id}}" class="mt-5" method="post" enctype="multipart/form-data">
+            <div class="form-row">
+                <div class="form-group col-md-6 mt-3">
+                    <label for="">Image</label>
+                    <img style="width: 40rem; height:30rem" src="/product-images/{{productDetails._id}}.jpg" alt="" id="productImage">
+                </div>
+                <div class="form-group col-md-6 mt-3">
+                    <label for="productName">Product Name</label>
+                    <input type="text" class="form-control" name="Name" value="{{productDetails.Name}}">
+                </div>
+                <div class="form-group col-md-6 mt-3">
+                    <label for="inputPassword4">Category</label>
+                    <input type="text" class="form-control" id="productCategory" placeholder="Category" name="Category"
+                        value="{{productDetails.Category}}">
+                </div>
+                <div class="form-group col-md-6 mt-3">
+                    <label for="productName">Description</label>
+                    <input type="text" class="form-control" id="productDes" placeholder="Description" name="Description"
+                        value="{{productDetails.Description}}">
+                </div>
+                <div class="form-group col-md-6 mt-3">
+                    <label for="productName">price</label>
+                    <input type="text" class="form-control" id="productprice" placeholder="Price" name="Price"
+                        value="{{productDetails.Price}}">
+                </div>
+                <div class="form-group col-md-6 mt-3">
+                    <label for="">Image</label>
+                    <input type="file" class="form-control" name="image" onchange="viewImage(event)">
+                </div>
+                
+                <div class="form-group col-md-6 mt-3">
+                    <button type="submit" class="btn btn-success">Update</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script>
+    function viewImage(event){
+        document.getElementById('productImage').src=URL.createObjectURL(event.target.files[0])
+    }
+</script>
