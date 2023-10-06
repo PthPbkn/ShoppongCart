@@ -12,12 +12,17 @@ const verifyLoggedIn = ((req, res, next) => {  /* function to verify user is log
   }
 })
 
+
+
 /* GET home page. */
-router.get('/', function (req, res, next) {
+router.get('/', async function (req, res, next) {
   let user = req.session.user
-  console.log(user)
+  let cartItemsCount=0
+  if(user){
+    cartItemsCount=await userHelpers.getCartCount(req.session.user._id)
+  }
   productHelpers.getAllProducts().then((products) => {
-    res.render('user/view-products', { products, user });
+    res.render('user/view-products', { products, user, cartItemsCount});
   })
 
 });
@@ -38,7 +43,7 @@ router.post('/logIn', (req, res) => {
       req.session.loggedIn = true
       req.session.user = response.user
       res.redirect('/')
-      console.log('login success')
+      //console.log('login success')
     }
     else {
       //req.session.loginErr=true OR another methode below
@@ -67,8 +72,18 @@ router.post('/signUp', (req, res) => {
 })
 
 
-router.get('/cart', verifyLoggedIn, (req, res) => {
-  res.render('user/cart')
+router.get('/add-to-cart/:id', verifyLoggedIn, (req, res)=>{                    // remove for ajax badge update
+//router.get('/add-to-cart/:id', (req, res)=>{
+  userHelpers.addToCart(req.params.id,req.session.user._id).then((response)=>{
+    res.redirect('/')                                                           // remove for ajax badge update
+  })
+})
+
+router.get('/cart', verifyLoggedIn, async(req,res)=>{
+  let cartProducts=await userHelpers.viewCart(req.session.user._id)
+  console.log(cartProducts)
+  res.render('user/cart',{cartProducts,user:req.session.user})
+  
 })
 
 module.exports = router;    
