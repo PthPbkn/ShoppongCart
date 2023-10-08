@@ -13,11 +13,13 @@
         <tbody>
             {{#each cartProducts}}
             <tr>
+                {{#each this.product}}
                 <th scope="row">1</th>
                 <td><img style="height: 50px; width: 50px" src="/product-images/{{this._id}}.jpg" alt=""></td>
                 <td>{{this.Name}}</td>
-                <td><button class="cart-item-count btn btn-danger mr-3">+</button>1<button class="btn btn-danger">-</button></td>
-                <td>{{this.Price}}</td>                
+                <td>{{this.Price}}</td>
+                {{/each}}     
+                <td><button class="cart-item-count btn btn-danger mr-3">-</button>{{this.quantity}}<button class="btn btn-danger">+</button></td>                         
                 <td><a class="btn btn-danger" href="/admin/delete-product/{{this._id}}">Remove</a></td>
             </tr>
             {{/each}}
