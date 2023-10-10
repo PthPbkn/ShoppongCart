@@ -2,27 +2,75 @@
     <table class="table mt-5">
         <thead>
             <tr>
+
                 <th scope="col">#</th>
                 <th scope="col">Image</th>
                 <th scope="col">Product Name</th>
                 <th scope="col">Quantity</th>
                 <th scope="col">Price</th>
-               
             </tr>
         </thead>
+
         <tbody>
             {{#each cartProducts}}
             <tr>
-                {{#each this.product}}
                 <th scope="row">1</th>
-                <td><img style="height: 50px; width: 50px" src="/product-images/{{this._id}}.jpg" alt=""></td>
-                <td>{{this.Name}}</td>
-                <td>{{this.Price}}</td>
-                {{/each}}     
-                <td><button class="cart-item-count btn btn-danger mr-3">-</button>{{this.quantity}}<button class="btn btn-danger">+</button></td>                         
+                <td><img style="height: 50px; width: 50px" src="/product-images/{{this.product._id}}.jpg" alt=""></td>
+                <td>{{this.product.Name}}</td>
+
+
+                <td>
+                    <button onclick="changeQuantity('{{this._id}}','{{this.product._id}}',-1)"
+                        class="btn btn-danger me-2">-</button>
+                    <span id="{{this.product._id}}">{{this.quantity}}</span>
+                    <button onclick="changeQuantity('{{this._id}}','{{this.product._id}}',1)"
+                        class="btn btn-danger ms-2">+</button>
+                </td>
+
+                <td>Rs. {{this.product.Price}}</td>
                 <td><a class="btn btn-danger" href="/admin/delete-product/{{this._id}}">Remove</a></td>
+
             </tr>
             {{/each}}
+            <tr>
+                <th>Total</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>Rs. {{total}}</th>
+            </tr>
         </tbody>
     </table>
+
+    <div class="float-right" style="width: 100%;">
+        <a href="/place-order" class="btn btn-success">Place order</a>
+    </div>
+
 </section>
+
+<script>
+    function changeQuantity(cartId, prodId, count) {
+        alert("need to fix ajax part")
+        let quantity = parseInt(document.getElementById(prodId).innerHTML)
+        let count = parseInt(count)
+        alert(count)
+        $.ajax({
+            url: '/change-product-quantity',
+            data: {
+                cart: cartId,
+                product: prodId, 
+                count: count,
+                quantity: quantity 
+            },
+            method: 'post',
+            success: function (response) {
+                if (response.removeProduct) {
+                    alert("Product removed from cart")
+                    location.reload()
+                } else {
+                    document.getElementById(prodId).innerHTML = quantity + count
+                }
+            }
+        })
+    }   
+</script>

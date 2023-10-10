@@ -86,4 +86,16 @@ router.get('/cart', verifyLoggedIn, async(req,res)=>{
   
 })
 
+router.post('/change-product-quantity',(req,res,next)=>{
+  colsole.log(req.body)
+  userHelpers.changeProductQuntity(req.body).then((response)=>{
+    res.json(response)
+  }) 
+}) 
+
+router.get('/place-order',verifyLoggedIn, async(req,res)=>{
+  let totalPrice=await userHelpers.getTotalAmount(req.session.user._id)
+  res.render('user/place-order',{totalPrice})
+})
+
 module.exports = router;    
