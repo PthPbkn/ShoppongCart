@@ -18,12 +18,11 @@
                 <td><img style="height: 50px; width: 50px" src="/product-images/{{this.product._id}}.jpg" alt=""></td>
                 <td>{{this.product.Name}}</td>
 
-
                 <td>
-                    <button onclick="changeQuantity('{{this._id}}','{{this.product._id}}',-1)"
+                    <button onclick="changeQuantity('{{this._id}}','{{this.product._id}}',-1,'{{../user._id}}')"
                         class="btn btn-danger me-2">-</button>
                     <span id="{{this.product._id}}">{{this.quantity}}</span>
-                    <button onclick="changeQuantity('{{this._id}}','{{this.product._id}}',1)"
+                    <button onclick="changeQuantity('{{this._id}}','{{this.product._id}}',1,'{{../user._id}}')"
                         class="btn btn-danger ms-2">+</button>
                 </td>
 
@@ -37,7 +36,7 @@
                 <th></th>
                 <th></th>
                 <th></th>
-                <th>Rs. {{total}}</th>
+                <th>Rs. <span id="totalValueID">{{totalValue}}</span></th>
             </tr>
         </tbody>
     </table>
@@ -49,7 +48,7 @@
 </section>
 
 <script>
-    function changeQuantity(cartId, prodId, count) {
+    function changeQuantity(cartId, prodId, count,userId) {
         alert("need to fix ajax part")
         let quantity = parseInt(document.getElementById(prodId).innerHTML)
         let count = parseInt(count)
@@ -60,7 +59,8 @@
                 cart: cartId,
                 product: prodId, 
                 count: count,
-                quantity: quantity 
+                quantity: quantity,
+                user: userId
             },
             method: 'post',
             success: function (response) {
@@ -69,6 +69,7 @@
                     location.reload()
                 } else {
                     document.getElementById(prodId).innerHTML = quantity + count
+                    document.getElementById('totalValueID').innerHTML=response.totalPrice
                 }
             }
         })

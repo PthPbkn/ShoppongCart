@@ -80,22 +80,47 @@ router.get('/add-to-cart/:id', verifyLoggedIn, (req, res)=>{                    
 })
 
 router.get('/cart', verifyLoggedIn, async(req,res)=>{
-  let cartProducts=await userHelpers.viewCart(req.session.user._id)
+  let user = req.session.user
+  let cartItemsCount=0
+  if(user){
+    cartItemsCount=await userHelpers.getCartCount(req.session.user._id)
+  }
+  let cartProducts=await userHelpers.getCartProducts(req.session.user._id)
+  let totalValue= await userHelpers.getTotalAmount(req.session.user._id)
   //console.log(cartProducts)
-  res.render('user/cart',{cartProducts,user:req.session.user})
+  res.render('user/cart',{cartProducts,user:req.session.user,totalValue,cartItemsCount})
   
 })
 
 router.post('/change-product-quantity',(req,res,next)=>{
   colsole.log(req.body)
-  userHelpers.changeProductQuntity(req.body).then((response)=>{
+  userHelpers.changeProductQuntity(req.body).then(async(response)=>{
+    response.totalPrice=await userHelpers.getTotalAmount(req.body.user)  // calling getTotalAmount func to change total amount when quantity change
     res.json(response)
   }) 
 }) 
 
 router.get('/place-order',verifyLoggedIn, async(req,res)=>{
+  let user = req.session.user
+  let cartItemsCount=0
+  if(user){
+    cartItemsCount=await userHelpers.getCartCount(req.session.user._id)
+  }
   let totalPrice=await userHelpers.getTotalAmount(req.session.user._id)
-  res.render('user/place-order',{totalPrice})
+  res.render('user/place-order',{totalPrice,user:req.session.user,cartItemsCount})
 })
 
+
+router.post('/place-order',verifyLoggedIn,async(req,res)=>{
+  console.log(req.body)
+
+  let products=await userHelpers.getCartProductList(req.session.user._id)
+
+  let totalPrice=await userHelpers.getTotalAmount(req.session.user._id)
+
+  userHelpers.placeOrder(req.body,products,totalPrice).then((response)=>{
+      res.json({status:true})
+  })
+  res.render('user/place-order',{user:req.session.user})  
+})
 module.exports = router;    

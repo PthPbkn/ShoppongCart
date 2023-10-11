@@ -1,3 +1,35 @@
 <section>
-    <h4>Rs.{{totalPrice}}</h4>
+
+    <div>
+        <p>Total Price: Rs. {{totalPrice}}</p>
+        <form id="checkout-form" method="post" style="width: 500px; margin-left:15rem; margin-top:6rem">
+            <div class="form-outline">
+                  <input type="text" id="form3Example1" class="form-control" name="Name"/>
+                  <label class="form-label" for="form3Example1">First name</label>
+            </div>
+            <div class="form-outline">
+                  <input type="text" id="form3Example1" class="form-control" name="Address"/>
+                  <input type="text" name="userId" value="{{user._id}}" hidden>
+                  <label class="form-label" for="form3Example1">First name</label>
+            </div>
+            <button class="btn btn-success">Submit</button>
+
+            
+        </form>
+    </div>
 </section>
+
+<script>
+    $("#checkout-form").submit(function(e){
+        e.preventDefault() // prevent submission of form
+        //alert("clicked")
+        $.ajax({
+            url:'/place-order',
+            method:'post',
+            data:$('#checkout-form').serialize(), // send all data from this form
+            success:function(Response){
+                alert(Response)
+            }
+        })
+    })
+</script>
