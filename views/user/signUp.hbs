@@ -1,83 +1,158 @@
-<!-- Section: Design Block -->
-<section class="text-center">
+<Section style="padding-top: 5rem";>
+  <!-- Login Form -->
+  <div class="container">
+    <div class="row justify-content-center mt-3">
+      <div class="col-lg-4 col-md-6 col-sm-6">
+        <div class="card shadow">
 
+          <div class="card-title text-center border-bottom bg-primary">
+            <h2 class="p-3 text-white">Create account</h2>
+          </div>
 
-  <div class="card mx-4 mx-md-5 shadow-5-strong" style="
-        margin-top: 50px;
-        background: hsla(0, 0%, 100%, 0.8);
-        backdrop-filter: blur(30px);">
-    <div class="card-body py-5 px-md-5">
+          <div class="card-body">
+            <form action="/signUp" method="POST">
 
-      <div class="row d-flex justify-content-center">
-        <div class="col-lg-8">
-          <h2 class="fw-bold mb-5">Sign up now</h2>
-          <form action="/signup" method="POST">
-            <!-- 2 column grid layout with text inputs for the first and last names -->
-            <div class="row">
-              <div class="col-md-6 mb-4">
-                <div class="form-outline">
-                  <input type="text" id="form3Example1" class="form-control" name="fName"/>
-                  <label class="form-label" for="form3Example1">First name</label>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="fName" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="fName" name="name" />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="lName" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="lName" name="sname" />
+                  </div>
                 </div>
               </div>
-              <div class="col-md-6 mb-4">
-                <div class="form-outline">
-                  <input type="text" id="form3Example2" class="form-control" name="lName"/>
-                  <label class="form-label" for="form3Example2">Last name</label>
+
+
+              <div class="row">
+                <div class="col-md-2">
+                  <div class="mb-3">
+                    <label for="house" class="form-label">House#</label>
+                    <input type="number" class="form-control" id="house" name="house" />
+                  </div>
+                </div>
+                <div class="col-md-10">
+                  <div class="mb-3">
+                    <label for="street" class="form-label">Street</label>
+                    <input type="text" class="form-control" id="username" name="street" />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Email input -->
+              <div class="row">
+                <div class="col-md-8">
+                  <div class="mb-3">
+                    <label for="city" class="form-label">City</label>
+                    <input type="text" class="form-control" id="city" name="city" />
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="zip" class="form-label">zip</label>
+                    <input type="text" class="form-control" id="username" name="zip" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" />
+              </div>
+
+              <div class="mb-3">
+                <label for="mobile" class="form-label">Mobile</label>
+                <input type="number" class="form-control" id="mobile" name="mobile" />
+              </div>
+
+              <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" />
+              </div>
+
+              <div class="d-grid">
+                <button type="submit" class="btn text-light main-bg">Submit</button>
+              </div>
+              <p>Already got an account? <a href="/logIn" class="link-info">Login here</a></p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{{!-- <section class="vh-100">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-6 text-black">
+
+
+        <div class="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5">
+          <form style="width: 23rem;" action="/logIn" method="post">
+            <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Log in</h3>
+            {{#if LoginErr}}
+            <!--<p class="text-danger">Invalid username or password</p> -->
+            <p class="text-danger">{{LoginErr}} </p>
+            {{/if}}
+
             <div class="form-outline mb-4">
-              <input type="email" id="form3Example3" class="form-control" name="Email" />
-              <label class="form-label" for="form3Example3">Email address</label>
+              <input type="email" id="form2Example18" class="form-control form-control-lg" name="Email"
+                value="pth@gmail.com" />
+              <label class="form-label" for="form2Example18">Email address</label>
             </div>
 
-            <!-- Password input -->
             <div class="form-outline mb-4">
-              <input type="password" id="form3Example4" class="form-control" name="Password" />
-              <label class="form-label" for="form3Example4">Password</label>
+              <input type="password" id="form2Example28" class="form-control form-control-lg" name="Password"
+                value="pth" />
+              <label class="form-label" for="form2Example28">Password</label>
             </div>
 
-            <!-- Checkbox 
-            <div class="form-check d-flex justify-content-center mb-4">
-              <input class="form-check-input me-2" type="checkbox" value="" id="form2Example33" checked />
-              <label class="form-check-label" for="form2Example33">
-                Subscribe to our newsletter
-              </label>
-            </div>  -->
+            <div class="pt-1 mb-4">
+              <button class="btn btn-info btn-lg btn-block" type="submit">Login</button>
+            </div>
 
-            <!-- Submit button -->
-            <button type="submit" class="btn btn-primary btn-block mb-4">
-              Sign up
-            </button>
+            <p class="small mb-5 pb-lg-2"><a class="text-muted" href="#!">Forgot password?</a></p>
+            <p>Don't have an account? <a href="/signup" class="link-info">Register here</a></p>
 
-            <!-- Register buttons  -->
-            <div class="text-center">
-              <p>Already have account? <a href="/login">Login</a></p>
-
-              <!--
-              <button type="button" class="btn btn-link btn-floating mx-1">
-                <i class="fab fa-facebook-f"></i>
-              </button>
-
-              <button type="button" class="btn btn-link btn-floating mx-1">
-                <i class="fab fa-google"></i>
-              </button>
-
-              <button type="button" class="btn btn-link btn-floating mx-1">
-                <i class="fab fa-twitter"></i>
-              </button>
-
-              <button type="button" class="btn btn-link btn-floating mx-1">
-                <i class="fab fa-github"></i>
-              </button>
-            </div>  -->
           </form>
         </div>
       </div>
     </div>
   </div>
-</section>
-<!-- Section: Design Block -->
+</section> --}}

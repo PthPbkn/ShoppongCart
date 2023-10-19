@@ -1,6 +1,7 @@
 {
   "name": "expressshoppingcart",
   "version": "0.0.0",
+  "main": "nodemon ./bin/www",
   "private": true,
   "scripts": {
     "start": "nodemon ./bin/www"
@@ -9,6 +10,7 @@
     "bcrypt": "^5.1.1",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-fileupload": "^1.4.1",
     "express-handlebars": "^7.1.2",
@@ -16,6 +18,8 @@
     "hbs": "^4.2.0",
     "http-errors": "~1.6.3",
     "mongodb": "^6.1.0",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "node-fetch": "^3.3.2",
+    "razorpay": "^2.9.2"
   }
 }
