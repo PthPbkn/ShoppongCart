@@ -105,13 +105,11 @@
 <script>
     $("#checkout-form").submit(function (e) {
         e.preventDefault() // prevent submission of form
-        //alert("clicked")
         $.ajax({
             url: '/place-order',
             method: 'post',
             data: $('#checkout-form').serialize(), // send all data from this form
             success: function (response) {
-                //alert(response.status)
                 razorpayPayment(response)
 
             }
@@ -119,7 +117,6 @@
     })
 
     function razorpayPayment(order) {
-        //alert("razorpayPayemnt function called")
         var options = {
             "key": "rzp_test_zd7eeAYu6Ev5Jm", // Enter the Key ID generated from the Dashboard
             "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise

@@ -144,7 +144,8 @@ router.post('/place-order',verifyLoggedIn,async(req,res)=>{
 
 
 router.get('/payment-status',verifyLoggedIn,(req,res)=>{
-  res.render('user/payment-status')
+  //res.render('user/payment-status')
+  res.render('user/order-list',{user:req.session.user})
 })
 
 router.post('/verify-payment',(req,res)=>{  
