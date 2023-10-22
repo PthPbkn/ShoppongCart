@@ -1,4 +1,4 @@
-<Section style="padding-top: 5rem";>
+<Section style="padding-top: 5rem" ;>
 
     <div class="container py-5">
         <div class="row d-flex justify-content-center my-4">
@@ -33,11 +33,11 @@
                                 <p>Price: £ {{this.product.Price}}</p>
                                 <button type="button" class="btn btn-primary btn-sm me-1 mb-2" data-mdb-toggle="tooltip"
                                     title="Remove item">
-                                    <i class="fas fa-trash"></i>
+                                    <i class="fa fa-trash"></i>
                                 </button>
                                 <button type="button" class="btn btn-danger btn-sm mb-2" data-mdb-toggle="tooltip"
                                     title="Move to the wish list">
-                                    <i class="fas fa-heart"></i>
+                                    <i class="fa fa-heart"></i>
                                 </button>
                                 <!-- Data -->
                             </div>
@@ -45,20 +45,27 @@
                             <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
                                 <!-- Quantity -->
                                 <div class="d-flex mb-4" style="max-width: 100px; height:50px">
-                                    <button class="btn btn-primary px-3 me-2"
-                                        onclick="this.parentNode.querySelector('input[type=number]').stepDown()">-</button>
+                                    <button class="btn btn-primary px-3 me-2" {{!--
+                                        onclick="this.parentNode.querySelector('input[type=number]').stepDown()"> --}}
+                                        onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
 
 
                                     <div class="form-outline">
-                                        <input id="form1" min="0" name="quantity" value="{{this.quantity}}"
+                                        <input id="currentQty" min="0" name="quantity" value="{{this.quantity}}"
                                             type="number" class="form-control" />
                                         <label class="form-label" for="form1">Quantity</label>
                                     </div>
+                                    <a class="btn btn-primary px-3 ms-2" href="/change-Product-quantity/{{this._id}}/{{this.product._id}}"><i
+                                            class="fa fa-plus"></i></a>
 
-                                    <button class="btn btn-primary px-3 ms-2"
-                                        onclick="this.parentNode.querySelector('input[type=number]').stepUp()">+</button>
+                                    {{!-- <button class="btn btn-primary px-3 ms-2"
+                                        onclick="changeProductQty('{{this._id}}','{{this.product._id}}',1,'{{../user._id}}')"><i
+                                            class="fa fa-plus"></i></button>--}}
                                 </div>
                                 <!-- Quantity -->
+                                {{!-- onclick="this.parentNode.querySelector('input[type=number]').stepUp()"> --}}
 
                                 <!-- Price -->
                                 <p class="text-start text-md-center">
@@ -196,30 +203,32 @@
 
 
 <script>
-    function changeQty(cartId, prodId, count, userId) {
-        alert("need to fix ajax part")
-        let quantity = parseInt(document.getElementById(prodId).innerHTML)
+    function changeProductQty(cartId, prodId, count, userId) {
+        //let quantity = parseInt(document.getElementById(currentQty).innerHTML)
         let countInt = parseInt(count)
         //alert(quantity)
         $.ajax({
-            url: '/change-product-quantity',
+            url: "/change-Product-quantity",
             data: {
                 cart: cartId,
                 product: prodId,
                 count: countInt,
-                quantity: quantity,
+                quantity: 12,
                 user: userId
             },
-            method: 'post',
+            method: "post",
             success: function (response) {
                 if (response.removeProduct) {
                     alert("Product removed from cart")
                     location.reload()
                 } else {
-                    document.getElementById(prodId).innerHTML = quantity + count
+                    document.getElementById(currentQty).innerHTML = quantity + count
                     document.getElementById('totalValueID').innerHTML = response.totalPrice
                 }
+            },
+            error: function (req, textStatus, errorThrown) {
+                alert('somthing wrong: ' + textStatus + ' ' + errorThrown)
             }
         })
-    }   
+    } 
 </script>

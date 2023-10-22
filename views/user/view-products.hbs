@@ -1,22 +1,20 @@
-        <div class="container">        
-        <Section style="padding-top: 7rem";>
-            <div class="row">
-
-                
-                {{#each products}}
-                <row class="col-md-3">
-                    <div class="card" style="width: 18rem;">
-                        <img src="/product-images/{{this._id}}.jpg"
-                            class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">{{this.Name}}</h5>
-                            <p class="card-text">{{this.Description}}</p>
-                            <a href="/add-to-cart/{{this._id}}" class="btn btn-primary">Add to cart</a>
-                            <!--<button onclick="addToCart('{{this._id}}')" class="btn btn-primary">Add to cart</button>-->
-                        </div>
+<div class="container" style="padding-top: 7rem;">
+    <div class="row justify-content-evenly">
+        {{#each products}}
+        <row class="col-md-3" style="width: 18rem; height:20rem">
+            <div class="card">
+                <img src="/product-images/{{this._id}}.jpg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">{{this.Name}}</h5>
+                    <p class="card-text text-success fw-bold">£{{this.Price}}</p>
+                    <div class="d-flex justify-content-evenly">
+                        <a href="/add-to-cart/{{this._id}}" class="btn btn-warning">Buy Now</a>
+                        <a href="/add-to-cart/{{this._id}}" class="btn btn-primary">Add to cart</a>
                     </div>
-                </row>
-                {{/each}}
+                    <!--<button onclick="addToCart('{{this._id}}')" class="btn btn-primary">Add to cart</button>-->
+                </div>
             </div>
-        </section>
-        </div>
+        </row>
+        {{/each}}
+    </div>
+</div>
