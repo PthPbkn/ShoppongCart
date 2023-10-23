@@ -27,7 +27,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(fileUpload());
-app.use(session({secret:"key",cookie:{maxAge:600000},resave:true,saveUninitialized:true})) // create session
+app.use(session({secret:"key",cookie:{maxAge:600000000},resave:true,saveUninitialized:true})) // create session
 db.connect((err)=>{
   if (err) console.log('Connection error' + err)
   else console.log('DB connection success')

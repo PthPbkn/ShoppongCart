@@ -106,14 +106,13 @@ router.get('/cart', verifyLoggedIn, async(req,res)=>{
 
 
 
-router.get('/change-Product-quantity/:id/:uid',(req,res,next)=>{
-  console.log("id.... "+req.params.id)
-  console.log("id.... "+req.params.uid)
-  res.redirect('/cart')
-  // userHelpers.changeProductQuntity(req.body).then(async(response)=>{
-  //   response.totalPrice=await userHelpers.getTotalAmount(req.body.user)  // calling getTotalAmount func to change total amount when quantity change
-  //   res.json(response)
-  //}) 
+router.post('/change-quantity',(req,res,next)=>{
+ 
+  userHelpers.changeProductQuntity(req.body).then(async(response)=>{
+    response.totalPrice=await userHelpers.getTotalAmount(req.body.user)  // calling getTotalAmount func to change total amount when quantity change
+    res.json(response)
+    console.log(response)
+  }) 
 }) 
 
 router.get('/place-order',verifyLoggedIn, async(req,res)=>{
@@ -144,13 +143,15 @@ router.post('/place-order',verifyLoggedIn,async(req,res)=>{
 
 
 router.get('/payment-status',verifyLoggedIn,(req,res)=>{
-  //res.render('user/payment-status')
-  res.render('user/order-list',{user:req.session.user})
+  res.render('user/payment-status')
+
 })
+
+
 
 router.post('/verify-payment',(req,res)=>{  
   userHelpers.verifyPayment(req.body).then(()=>{
-    //console.log(req.body['order[receipt]'])
+        //console.log(req.body['order[receipt]'])
 
     userHelpers.changePaymentStatus(req.body['order[receipt]']).then(()=>{
       console.log("Payment Success")

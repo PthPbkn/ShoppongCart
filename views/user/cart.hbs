@@ -44,29 +44,18 @@
 
                             <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
                                 <!-- Quantity -->
-                                <div class="d-flex mb-4" style="max-width: 100px; height:50px">
-                                    <button class="btn btn-primary px-3 me-2" {{!--
-                                        onclick="this.parentNode.querySelector('input[type=number]').stepDown()"> --}}
-                                        onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                                <div class="d-flex mb-4" style="max-width: 100px; height:40px">
+                                    <button class="btn btn-primary px-3 me-1"
+                                        onclick="chngeq('{{this._id}}','{{this.product._id}}','{{../user._id}}',-1)">
                                         <i class="fa fa-minus"></i>
                                     </button>
-
-
-                                    <div class="form-outline">
-                                        <input id="currentQty" min="0" name="quantity" value="{{this.quantity}}"
-                                            type="number" class="form-control" />
-                                        <label class="form-label" for="form1">Quantity</label>
+                                    <div class="p-2 bg-light">
+                                            <span id="{{this.product._id}}">{{this.quantity}}</span>                                  
                                     </div>
-                                    <a class="btn btn-primary px-3 ms-2" href="/change-Product-quantity/{{this._id}}/{{this.product._id}}"><i
-                                            class="fa fa-plus"></i></a>
-
-                                    {{!-- <button class="btn btn-primary px-3 ms-2"
-                                        onclick="changeProductQty('{{this._id}}','{{this.product._id}}',1,'{{../user._id}}')"><i
-                                            class="fa fa-plus"></i></button>--}}
+                                    <button class="btn btn-primary px-3 ms-1"
+                                        onclick="chngeq('{{this._id}}','{{this.product._id}}','{{../user._id}}',1)">
+                                        <i class="fa fa-plus"></i></button>
                                 </div>
-                                <!-- Quantity -->
-                                {{!-- onclick="this.parentNode.querySelector('input[type=number]').stepUp()"> --}}
-
                                 <!-- Price -->
                                 <p class="text-start text-md-center">
                                     <strong>£{{totalValue}}</strong>
@@ -109,7 +98,7 @@
                             <li
                                 class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0">
                                 Products
-                                <span>£{{totalValue}}</span>
+                                <span id="total">£{{totalValue}}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                                 Shipping
@@ -123,7 +112,7 @@
                                         <p class="mb-0">(including VAT)</p>
                                     </strong>
                                 </div>
-                                <span><strong>£{{totalValue}}</strong></span>
+                                <span id="total"><strong>£{{totalValue}}</strong></span>
                             </li>
                         </ul>
 
@@ -140,94 +129,31 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-{{!-- start --}}
-{{!--
-<table class="table mt-5">
-    <thead>
-        <tr>
-
-            <th scope="col">#</th>
-            <th scope="col">Image</th>
-            <th scope="col">Product Name</th>
-            <th scope="col">Quantity</th>
-            <th scope="col">Price</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        {{#each cartProducts}}
-        <tr>
-            <th scope="row">1</th>
-            <td><img style="height: 50px; width: 50px" src="/product-images/{{this.product._id}}.jpg" alt=""></td>
-            <td>{{this.product.Name}}</td>
-
-            <td>
-                <button onclick="changeQty('{{this._id}}','{{this.product._id}}',-1,'{{../user._id}}')"
-                    class="btn btn-danger me-2">-</button>
-                <span id="{{this.product._id}}">{{this.quantity}}</span>
-                <button onclick="changeQty('{{this._id}}','{{this.product._id}}',1,'{{../user._id}}')"
-                    class="btn btn-danger ms-2">+</button>
-            </td>
-
-            <td>Rs. {{this.product.Price}}</td>
-            <td><a class="btn btn-danger" href="/admin/delete-product/{{this._id}}">Remove</a></td>
-
-        </tr>
-        {{/each}}
-        <tr>
-            <th>Total</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th>Rs. <span id="totalValueID">{{totalValue}}</span></th>
-        </tr>
-    </tbody>
-</table>
-
-<div class="float-right" style="width: 100%;">
-    <a href="/place-order" class="btn btn-success">Place order</a>
-</div>--}}
-
-
-
 <script>
-    function changeProductQty(cartId, prodId, count, userId) {
-        //let quantity = parseInt(document.getElementById(currentQty).innerHTML)
-        let countInt = parseInt(count)
-        //alert(quantity)
+    function chngeq(cartId, proId, userId, count) {
+        let quantity = parseInt(document.getElementById(proId).innerHTML)
+        quantity = parseInt(quantity)
+        count = parseInt(count)
+    
+
         $.ajax({
-            url: "/change-Product-quantity",
+            url: '/change-quantity',
             data: {
+                user: userId,
                 cart: cartId,
-                product: prodId,
-                count: countInt,
-                quantity: 12,
-                user: userId
+                product: proId,
+                count: count,
+                quantity: quantity
             },
-            method: "post",
-            success: function (response) {
+            method: 'post',
+            success: (response) => {
                 if (response.removeProduct) {
-                    alert("Product removed from cart")
+                    alert("Product Removed from cart")
                     location.reload()
                 } else {
-                    document.getElementById(currentQty).innerHTML = quantity + count
-                    document.getElementById('totalValueID').innerHTML = response.totalPrice
+                    document.getElementById(proId).innerHTML = quantity + count
+                    document.getElementById('total').innerHTML = response.total
                 }
-            },
-            error: function (req, textStatus, errorThrown) {
-                alert('somthing wrong: ' + textStatus + ' ' + errorThrown)
             }
         })
     } 
