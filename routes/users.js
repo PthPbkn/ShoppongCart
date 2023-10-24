@@ -106,14 +106,20 @@ router.get('/cart', verifyLoggedIn, async(req,res)=>{
 
 
 
-router.post('/change-quantity',(req,res,next)=>{
- 
+router.post('/change-quantity',(req,res,next)=>{ 
   userHelpers.changeProductQuntity(req.body).then(async(response)=>{
     response.totalPrice=await userHelpers.getTotalAmount(req.body.user)  // calling getTotalAmount func to change total amount when quantity change
     res.json(response)
-    console.log(response)
+    console.log(response.total)
+    //console.log(response)
   }) 
 }) 
+
+router.post('/remove-item',(req,res,next)=>{
+  userHelpers.removeItem(req.body).then((response)=>{
+    res.json(response)
+  })
+})
 
 router.get('/place-order',verifyLoggedIn, async(req,res)=>{
   let user = req.session.user
