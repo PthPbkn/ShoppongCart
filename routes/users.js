@@ -12,17 +12,22 @@ const verifyLoggedIn = ((req, res, next) => {  /* function to verify user is log
   }
 })
 
+const pounds = Intl.NumberFormat('en-GB', {
+  style: 'currency',
+  currency: 'GBP'
+})
+
 
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {
   let user = req.session.user
-  let cartItemsCount=0
-  if(user){
-    cartItemsCount=await userHelpers.getCartCount(req.session.user._id)
+  let cartItemsCount = 0
+  if (user) {
+    cartItemsCount = await userHelpers.getCartCount(req.session.user._id)
   }
   productHelpers.getAllProducts().then((products) => {
-    res.render('user/view-products', { products, user, cartItemsCount});
+    res.render('user/view-products', { products, user, cartItemsCount });
   })
 
 });
@@ -77,104 +82,110 @@ router.post('/signUp', (req, res) => {
 })
 
 
-router.get('/add-to-cart/:id', verifyLoggedIn, (req, res)=>{                    // remove for ajax badge update
-//router.get('/add-to-cart/:id', (req, res)=>{
-  userHelpers.addToCart(req.params.id,req.session.user._id).then((response)=>{
+router.get('/add-to-cart/:id', verifyLoggedIn, (req, res) => {                    // remove for ajax badge update
+  //router.get('/add-to-cart/:id', (req, res)=>{
+  userHelpers.addToCart(req.params.id, req.session.user._id).then((response) => {
     res.redirect('/')                                                            // remove for ajax badge update
-  })  
+  })
 })
- 
 
 
 
-router.get('/cart', verifyLoggedIn, async(req,res)=>{ 
+
+router.get('/cart', verifyLoggedIn, async (req, res) => {
   let user = req.session.user
-  let cartItemsCount=0
-  if(user){
-    cartItemsCount=await userHelpers.getCartCount(req.session.user._id)
+  let shipping = "6.99"
+  let cartItemsCount = 0
+  let totalAmount;
+  let amount;
+  if (user) {
+    cartItemsCount = await userHelpers.getCartCount(req.session.user._id)
   }
-  let cartProducts=await userHelpers.getCartProducts(req.session.user._id)
-  if(cartItemsCount!=0){
-    var totalValue=await userHelpers.getTotalAmount(req.session.user._id)
-  }else{
-    var totalValue=0
-  }  
+  let cartProducts = await userHelpers.getCartProducts(req.session.user._id)
+  if (cartItemsCount != 0) {
+    amount = await userHelpers.getTotalAmount(req.session.user._id)
+    totalAmount = pounds.format(parseFloat(amount) + parseFloat(shipping))
+    amount=pounds.format(amount)
+    shipping=pounds.format(shipping)
+  } else {
+    amount = 0
+  }
   //console.log(cartProducts)
-  res.render('user/cart',{cartProducts,user:req.session.user,totalValue,cartItemsCount})
-  
+  res.render('user/cart', { cartProducts, user: req.session.user, amount, cartItemsCount, totalAmount, shipping })
+
 })
 
 
 
-router.post('/change-quantity',(req,res,next)=>{ 
-  userHelpers.changeProductQuntity(req.body).then(async(response)=>{
-    response.totalPrice=await userHelpers.getTotalAmount(req.body.user)  // calling getTotalAmount func to change total amount when quantity change
+router.post('/change-quantity', (req, res, next) => {
+  userHelpers.changeProductQuntity(req.body).then(async (response) => {
+    response.totalPrice = await userHelpers.getTotalAmount(req.body.user)  // calling getTotalAmount func to change total amount when quantity change
     res.json(response)
     console.log(response.total)
     //console.log(response)
-  }) 
-}) 
+  })
+})
 
-router.post('/remove-item',(req,res,next)=>{
-  userHelpers.removeItem(req.body).then((response)=>{
+router.post('/remove-item', (req, res, next) => {
+  userHelpers.removeItem(req.body).then((response) => {
     res.json(response)
   })
 })
 
-router.get('/place-order',verifyLoggedIn, async(req,res)=>{
+router.get('/place-order', verifyLoggedIn, async (req, res) => {
   let user = req.session.user
-  let cartItemsCount=0
-  if(user){
-    cartItemsCount=await userHelpers.getCartCount(req.session.user._id)
+  let cartItemsCount = 0
+  if (user) {
+    cartItemsCount = await userHelpers.getCartCount(req.session.user._id)
   }
-  let address=await userHelpers.getAddress(req.session.user._id)
+  let address = await userHelpers.getAddress(req.session.user._id)
   console.log(address)
-  let totalPrice=await userHelpers.getTotalAmount(req.session.user._id)
-  res.render('user/place-order',{totalPrice,user:req.session.user,cartItemsCount,address})
-})  
+  let totalPrice = await userHelpers.getTotalAmount(req.session.user._id)
+  res.render('user/place-order', { totalPrice, user: req.session.user, cartItemsCount, address })
+})
 
 
-router.post('/place-order',verifyLoggedIn,async(req,res)=>{
-  let products=await userHelpers.getCartProductList(req.session.user._id)
-  let totalPrice=await userHelpers.getTotalAmount(req.session.user._id)  
+router.post('/place-order', verifyLoggedIn, async (req, res) => {
+  let products = await userHelpers.getCartProductList(req.session.user._id)
+  let totalPrice = await userHelpers.getTotalAmount(req.session.user._id)
 
-  userHelpers.placeOrder(req.body,products,totalPrice).then((orderId)=>{
-      //res.json({status:true})
-      //console.log("order id :"+orderId)
-      userHelpers.generateRazorPay(orderId,totalPrice).then((response)=>{
-        res.json(response) 
-      })
+  userHelpers.placeOrder(req.body, products, totalPrice).then((orderId) => {
+    //res.json({status:true})
+    //console.log("order id :"+orderId)
+    userHelpers.generateRazorPay(orderId, totalPrice).then((response) => {
+      res.json(response)
+    })
   })
 })
 
 
-router.get('/payment-status',verifyLoggedIn,(req,res)=>{
+router.get('/payment-status', verifyLoggedIn, (req, res) => {
   res.render('user/payment-status')
 
 })
 
 
 
-router.post('/verify-payment',(req,res)=>{  
-  userHelpers.verifyPayment(req.body).then(()=>{
-        //console.log(req.body['order[receipt]'])
+router.post('/verify-payment', (req, res) => {
+  userHelpers.verifyPayment(req.body).then(() => {
+    //console.log(req.body['order[receipt]'])
 
-    userHelpers.changePaymentStatus(req.body['order[receipt]']).then(()=>{
+    userHelpers.changePaymentStatus(req.body['order[receipt]']).then(() => {
       console.log("Payment Success")
-      res.json({status:true})
+      res.json({ status: true })
     })
-  }).catch((err)=>{
-    res.json({status:'Payment failed'})
+  }).catch((err) => {
+    res.json({ status: 'Payment failed' })
   })
 })
 
-router.get('/order-list',verifyLoggedIn,async(req,res)=>{
-  let cartItemsCount=0
-  if(req.session.user){
-    cartItemsCount=await userHelpers.getCartCount(req.session.user._id)
+router.get('/order-list', verifyLoggedIn, async (req, res) => {
+  let cartItemsCount = 0
+  if (req.session.user) {
+    cartItemsCount = await userHelpers.getCartCount(req.session.user._id)
   }
-  let ordersList=await userHelpers.getOrdersList(req.session.user._id)
-  res.render('user/order-list',{user:req.session.user,ordersList,cartItemsCount})
+  let ordersList = await userHelpers.getOrdersList(req.session.user._id)
+  res.render('user/order-list', { user: req.session.user, ordersList, cartItemsCount })
 })
 
 

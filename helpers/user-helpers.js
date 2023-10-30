@@ -6,7 +6,12 @@ const bcrypt = require('bcrypt')
 const { ObjectId } = require('mongodb')
 const { response } = require('express');
 const { resolve } = require('path');
-const { rejects } = require('assert');
+
+
+const pounds = Intl.NumberFormat('en-GB',{
+    style:'currency',
+    currency:'GBP'
+})
 
 
 
@@ -234,23 +239,29 @@ module.exports = {
                         localField: 'item',
                         foreignField: '_id',
                         as: 'product'
-                    }
+                    } 
                 },
                 {
                     $project: {
                         item: 1, quantity: 1, product: { $arrayElemAt: ['$product', 0] }
                     }
+                
                 },
                 {
-                    $project: {
-                        quantity: '$quantity',
-                        Price: '$product.Price',
-                        total: { $sum: { $multiply: [{ $toInt: "$quantity" }, { $toInt: "$product.Price" }] } }
+                    $group:
+                    {
+                        _id:null,
+                        total:{$sum:{$multiply: [{ $toInt: "$quantity" }, { $toInt: "$product.Price" }]}}
                     }
+                    // $project: {
+                    //     quantity: '$quantity',
+                    //     Price: '$product.Price',
+                    //     total: { $sum: { $multiply: [{ $toInt: "$quantity" }, { $toInt: "$product.Price" }] } }
+                    // }
                 }
             ]).toArray()
-            //console.log(total)
-            console.log("Total Price: " + total[0].total)
+            console.log('Total Price:' + pounds.format(total[0].total))
+            //console.log('Pounds: ${pounds.format(price)}');
             resolve(total[0].total)
         })
 
@@ -331,12 +342,12 @@ module.exports = {
         return new Promise((resolve, reject) => {
             console.log("payment status :" + orderId)
             db.get().collection(collection.ORDER_COLLECTION)
-                .updateOne({ _Id: new ObjectId(orderId) },
-                    {
-                        $set: { status: 'placed' }
-                    }).then(() => {
-                        resolve()
-                    })
+                .updateOne(
+                    { _Id: new ObjectId(orderId) },
+                    { $set: { status: 'Oreder placed' } }
+                ).then(() => {
+                    resolve()
+                })
         })
     },
     getOrdersList: (userId) => {
@@ -369,8 +380,20 @@ module.exports = {
                 },
                 {
                     $project: {
-                        time: 1, amount: 1, status: 1, item: 1, quantity: 1, product: { $arrayElemAt: ['$product', 0] }
+                        time:1, status:1, item: 1, quantity: 1, product: { $arrayElemAt: ['$product', 0] }
                     }
+                },
+                {
+                    $project: {
+                        quantity: '$quantity',
+                        Price: '$product.Price',
+                        description: '$product.Description',
+                        name: '$product.Name',
+                        time: 1, status: 1, item: 1, quantity: 1, amount: { $multiply: [{ $toInt: "$quantity" }, { $toInt: "$product.Price" }] }
+                    }
+                },
+                {
+                    $sort: {time: -1}
                 }
 
             ]).toArray()
