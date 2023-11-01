@@ -8,6 +8,12 @@ const { response } = require('express');
 const { resolve } = require('path');
 
 
+const pounds = Intl.NumberFormat('en-GB',{
+    style:'currency',
+    currency:'GBP'
+})
+
+
 
 
 
@@ -157,7 +163,7 @@ module.exports = {
         let count = parseInt(details.count)
         let quantity = parseInt(details.quantity)
 
-        console.log("helper function called")
+        //console.log("helper function called")
 
         return new Promise((resolve, reject) => {
             if (count == -1 && quantity == 1) {                   // if user pressing '-' button and present quantity is 1, then..
@@ -190,6 +196,26 @@ module.exports = {
 
         })
     },
+
+    removeItem: (details) => {
+        return new Promise((resolve, reject) => {
+            db.get().collection(collection.CART_COLLECTION)
+                .updateOne(
+                    {
+                        _id: new ObjectId(details.cart)
+                    },
+                    {
+                        $pull: { products: { item: new ObjectId(details.product) } } //remove particular product from products array
+                    }
+
+                ).then((response) => {
+                    resolve({ removeProduct: true })
+                })
+        })
+
+    },
+
+
     getTotalAmount: (userId) => {
         //console.log("User id: "+userId)
         return new Promise(async (resolve, reject) => {
@@ -213,23 +239,29 @@ module.exports = {
                         localField: 'item',
                         foreignField: '_id',
                         as: 'product'
-                    }
+                    } 
                 },
                 {
                     $project: {
                         item: 1, quantity: 1, product: { $arrayElemAt: ['$product', 0] }
                     }
+                
                 },
                 {
-                    $project: {
-                        quantity: '$quantity',
-                        Price: '$product.Price',
-                        total: { $sum: { $multiply: [{ $toInt: "$quantity" }, { $toInt: "$product.Price" }] } }
+                    $group:
+                    {
+                        _id:null,
+                        total:{$sum:{$multiply: [{ $toInt: "$quantity" }, { $toInt: "$product.Price" }]}}
                     }
+                    // $project: {
+                    //     quantity: '$quantity',
+                    //     Price: '$product.Price',
+                    //     total: { $sum: { $multiply: [{ $toInt: "$quantity" }, { $toInt: "$product.Price" }] } }
+                    // }
                 }
             ]).toArray()
-            //console.log(total) 
-            console.log("Total Price: " + total[0].total)
+            console.log('Total Price:' + pounds.format(total[0].total))
+            //console.log('Pounds: ${pounds.format(price)}');
             resolve(total[0].total)
         })
 
@@ -254,7 +286,7 @@ module.exports = {
                 time: new Date()
             }
             db.get().collection(collection.ORDER_COLLECTION).insertOne(orderObj).then((response) => {
-                db.get().collection(collection.CART_COLLECTION).deleteOne({ user: new ObjectId(order.userId)})
+                db.get().collection(collection.CART_COLLECTION).deleteOne({ user: new ObjectId(order.userId) })
                 //console.log("response: "+ response.ops.insertedId)
                 //console.log("order user id: "+response.insertedId)
                 resolve(response.insertedId)
@@ -273,7 +305,7 @@ module.exports = {
         console.log("order id :" + orderId)
         return new Promise((resolve, reject) => {
             instance.orders.create({
-                amount: price*100,
+                amount: price * 100,
                 currency: "INR",
                 receipt: orderId,
                 notes: {
@@ -295,8 +327,8 @@ module.exports = {
             const crypto = require('crypto')
             let hmac = crypto.createHmac('sha256', 'LqYcfflJsvf6vSGR2ki5O55X')
             hmac.update(payDetails['payment[razorpay_order_id]'] + '|' + payDetails['payment[razorpay_payment_id]'])
-            hmac=hmac.digest('hex')
-            if (hmac==payDetails['payment[razorpay_signature]']) {
+            hmac = hmac.digest('hex')
+            if (hmac == payDetails['payment[razorpay_signature]']) {
                 console.log("hmac success")
                 resolve()
             } else {
@@ -306,77 +338,89 @@ module.exports = {
 
         })
     },
-    changePaymentStatus:(orderId)=>{
-        return new Promise((resolve,reject)=>{
-            console.log("payment status :"+ orderId)
+    changePaymentStatus: (orderId) => {
+        return new Promise((resolve, reject) => {
+            console.log("payment status :" + orderId)
             db.get().collection(collection.ORDER_COLLECTION)
-            .updateOne({_Id: new ObjectId(orderId)},
-            {
-                $set:{status:'placed'}
-            }).then(()=>{
-                resolve()
-            })
+                .updateOne(
+                    { _Id: new ObjectId(orderId) },
+                    { $set: { status: 'Oreder placed' } }
+                ).then(() => {
+                    resolve()
+                })
         })
     },
-    getOrdersList:(userId)=>{
-        return new Promise (async(resolve,reject)=>{
+    getOrdersList: (userId) => {
+        return new Promise(async (resolve, reject) => {
             console.log(userId)
             //let ordersList=await db.get().collection(collection.ORDER_COLLECTION).find({userId:new ObjectId(userId)}).toArray()
-            let orderList=await db.get().collection(collection.ORDER_COLLECTION).aggregate([
-            {
-                $match:{userId:new ObjectId(userId)}
-            },
-            {
-                $unwind:'$products'
-            },
-            {
-                $project:{
-                    item:'$products.item',
-                    quantity:'$products.quantity',
-                    time:'$time',
-                    amount:'$totalAmount',
-                    status:'$status'
+            let orderList = await db.get().collection(collection.ORDER_COLLECTION).aggregate([
+                {
+                    $match: { userId: new ObjectId(userId) }
+                },
+                {
+                    $unwind: '$products'
+                },
+                {
+                    $project: {
+                        item: '$products.item',
+                        quantity: '$products.quantity',
+                        time: '$time',
+                        amount: '$totalAmount',
+                        status: '$status'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: collection.PRODUCT_COLLECTION,
+                        localField: 'item',
+                        foreignField: '_id',
+                        as: 'product'
+                    }
+                },
+                {
+                    $project: {
+                        time:1, status:1, item: 1, quantity: 1, product: { $arrayElemAt: ['$product', 0] }
+                    }
+                },
+                {
+                    $project: {
+                        quantity: '$quantity',
+                        Price: '$product.Price',
+                        description: '$product.Description',
+                        name: '$product.Name',
+                        time: 1, status: 1, item: 1, quantity: 1, amount: { $multiply: [{ $toInt: "$quantity" }, { $toInt: "$product.Price" }] }
+                    }
+                },
+                {
+                    $sort: {time: -1}
                 }
-            },
-            {
-                $lookup:{
-                    from:collection.PRODUCT_COLLECTION,
-                    localField:'item',
-                    foreignField:'_id',
-                    as:'product'
-                }
-            },
-            {
-                $project:{
-                    time:1,amount:1,status:1,item:1,quantity:1,product:{$arrayElemAt:['$product',0]}
-                }
-            }
 
-        ]).toArray()
+            ]).toArray()
             console.log(orderList)
             resolve(orderList)
         })
     },
-    getAddress:(userId)=>{
-        return new Promise (async(resolve,reject)=>{
-           let address=await db.get().collection(collection.USER_COLLECTION).findOne({_id:new ObjectId(userId)})
-           resolve(address)
-           console.log(address)
+    getAddress: (userId) => {
+        return new Promise(async (resolve, reject) => {
+            let address = await db.get().collection(collection.USER_COLLECTION).findOne({ _id: new ObjectId(userId) })
+            resolve(address)
+            console.log(address)
         })
-        
+
     }
 
 
 
-                // {
-                //     $group:
-                //     {
-                //         _id:null,
-                //         //total:{$sum:{$multiply:['$quantity','$product.Price']}}
-                //         total: {$sum:{ $multiply: [ "$product.Price", "$quantity" ] } }
-                //         //total:{$sum:{$multiply:["$ ",{$toInt:'$product.Price'}]}}
-                //         //total:{$sum:{$multiply:[{ $toInt: '$quantity' },{ $toInt: '$product.Price' }]}}
-                //     }        
-                // }   
+    // {
+    //     $group:
+    //     {
+    //         _id:null,
+    //         //total:{$sum:{$multiply:['$quantity','$product.Price']}}
+    //         total: {$sum:{ $multiply: [ "$product.Price", "$quantity" ] } }
+    //         //total:{$sum:{$multiply:["$ ",{$toInt:'$product.Price'}]}}
+    //         //total:{$sum:{$multiply:[{ $toInt: '$quantity' },{ $toInt: '$product.Price' }]}}
+    //     }        
+    // }   
 
 }

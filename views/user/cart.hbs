@@ -31,8 +31,10 @@
                                 <p><strong>{{this.product.Name}}</strong></p>
                                 <p>Color: blue</p>
                                 <p>Price: £ {{this.product.Price}}</p>
+
                                 <button type="button" class="btn btn-primary btn-sm me-1 mb-2" data-mdb-toggle="tooltip"
-                                    title="Remove item">
+                                    title="Remove item"
+                                    onclick="removeitem('{{this._id}}','{{this.product._id}}','{{../user._id}}',1)">
                                     <i class="fa fa-trash"></i>
                                 </button>
                                 <button type="button" class="btn btn-danger btn-sm mb-2" data-mdb-toggle="tooltip"
@@ -42,24 +44,24 @@
                                 <!-- Data -->
                             </div>
 
-                            <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+                            <div class="col-lg-4 col-md-6 mb-4 mb-lg-0 d-flex align-items-center justify-content-center">
                                 <!-- Quantity -->
                                 <div class="d-flex mb-4" style="max-width: 100px; height:40px">
                                     <button class="btn btn-primary px-3 me-1"
-                                        onclick="chngeq('{{this._id}}','{{this.product._id}}','{{../user._id}}',-1)">
+                                        onclick="chngequantity('{{this._id}}','{{this.product._id}}','{{../user._id}}',-1)">
                                         <i class="fa fa-minus"></i>
                                     </button>
                                     <div class="p-2 bg-light">
-                                            <span id="{{this.product._id}}">{{this.quantity}}</span>                                  
+                                        <span id="{{this.product._id}}">{{this.quantity}}</span>
                                     </div>
                                     <button class="btn btn-primary px-3 ms-1"
-                                        onclick="chngeq('{{this._id}}','{{this.product._id}}','{{../user._id}}',1)">
+                                        onclick="chngequantity('{{this._id}}','{{this.product._id}}','{{../user._id}}',1)">
                                         <i class="fa fa-plus"></i></button>
                                 </div>
                                 <!-- Price -->
-                                <p class="text-start text-md-center">
+                                {{!-- <p class="text-start text-md-center">
                                     <strong>£{{totalValue}}</strong>
-                                </p>
+                                </p> --}}
                                 <!-- Price -->
                             </div>
                         </div>
@@ -94,15 +96,16 @@
                         <h5 class="mb-0">Summary</h5>
                     </div>
                     <div class="card-body">
+                        <span id="total" hidden>£{{amount}}</span>
                         <ul class="list-group list-group-flush">
                             <li
                                 class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0">
                                 Products
-                                <span id="total">£{{totalValue}}</span>
+                                <span id="total">{{amount}}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                                 Shipping
-                                <span>0.00</span>
+                                <span>{{shipping}}</span>
                             </li>
                             <li
                                 class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3">
@@ -112,7 +115,7 @@
                                         <p class="mb-0">(including VAT)</p>
                                     </strong>
                                 </div>
-                                <span id="total"><strong>£{{totalValue}}</strong></span>
+                                <span id="total"><strong>{{totalAmount}}</strong></span>
                             </li>
                         </ul>
 
@@ -130,11 +133,11 @@
 
 
 <script>
-    function chngeq(cartId, proId, userId, count) {
+    function chngequantity(cartId, proId, userId, count) {
         let quantity = parseInt(document.getElementById(proId).innerHTML)
         quantity = parseInt(quantity)
         count = parseInt(count)
-    
+
 
         $.ajax({
             url: '/change-quantity',
@@ -153,8 +156,31 @@
                 } else {
                     document.getElementById(proId).innerHTML = quantity + count
                     document.getElementById('total').innerHTML = response.total
+                    location.reload()
                 }
             }
         })
-    } 
+    }
+
+    function removeitem(cartId, prodID, userId) {
+        $.ajax({
+            url: '/remove-item',
+            data: {
+                user: userId,
+                cart: cartId,
+                product: prodID,
+            },
+            method:'post',
+            success:(response)=>{
+                if(response.removeProduct){
+                    alert("Product Removed from cart")
+
+                } else{
+                    alert("Failed to removed item")
+                }
+                location.reload()
+            }
+        })
+    }
+
 </script>
