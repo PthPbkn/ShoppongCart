@@ -228,7 +228,7 @@ module.exports = {
                     }
                 }
             ]).toArray()
-            //console.log(total)
+            //console.log(total) 
             console.log("Total Price: " + total[0].total)
             resolve(total[0].total)
         })
